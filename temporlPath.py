@@ -56,44 +56,35 @@ def quad_triple(e):
 
 
 
-def paths(convert_path):
+def quad_tuple_paths(convert_path):
     """
     input: [('a', 'c', {0: {'duraTime': 1, 'startTime': 4}}),
             ('c', 'h', {0: {'duraTime': 1, 'startTime': 6}}),
             ('h', 'i', {0: {'duraTime': 1, 'startTime': 7}})，
             ('i', 'l', {0: {'duraTime': 1, 'startTime': 9}, 1: {'duraTime': 1, 'startTime': 8}})]
-    
+
     output: paths = [path1, path2] path1 = [e1, e2, e3, e4] e1 = ('a', 'c', 4, 1), e2=('c', 'h', 6, 1)..,e4=('i', 'l', 8, 1)
                                    path2 = [e1, e2, e3, e4'] e1 = ('a', 'c', 4, 1), e2=('c', 'h', 6, 1)..,e4=('i', 'l', 9, 1)
     """
-    result = []
-    path=[]
-    new_path = []
+    path = []
     for e in convert_path:
-        et_list = quad_triple(e)
-        if len(et_list) == 1:
-            path.extend(et_list[0])
-            continue
-        if len(et_list) > 1:
-            len_et = len(et_list)
-            for i in range(len_et):
-                new_path = path
-                new_path.extend(et_list[i])
-                
+        et_list = quad_tuple(e)
+        path.extend(et_list)
 
-        
+    return path
 
-    
+
+
 
 
 def is_temp_path(path):
     """
     input path = [e1, e2,...], e1 = ('a', 'b', 3, 1)
-    output True or False    
+    output True or False
     """
     if len(path) <= 1:
         return True
-    
+
     for i in range(len(path)-1):
          if (path[i][2] + path[i][3]) <= path[i+1][2]:
              continue
@@ -103,14 +94,14 @@ def is_temp_path(path):
 
 
 
-   
+
 
 if __name__ == "__main__":
     t_alpha = 0
     t_beta = 10
 
     MG = nx.MultiDiGraph()
-    
+
     MG.add_nodes_from(['a', 'b', 'c', 'f', 'g', 'h', 'i', 'j', 'k', 'l'])
 
     MG.add_edge('a', 'b', startTime=1, duraTime=1)
@@ -128,7 +119,7 @@ if __name__ == "__main__":
     MG.add_edge('h', 'i', startTime=7, duraTime=1)
     MG.add_edge('i', 'l', startTime=9, duraTime=1)
     MG.add_edge('i', 'l', startTime=8, duraTime=1)
-    
+
     # nx.draw_networkx(MG, pos=nx.spring_layout(MG))
     # plt.show()
 
