@@ -51,10 +51,85 @@ def latest_departure_time(TG, reversed_edge_stream, x, t_start, t_end):
     return t
 
     
+def mutli_pass_fatest_path_duration(TG, edge_stream, x, t_start, t_end):
+  
+    f = {}
+    t = {}
+    f[x] = 0
+    S = set()
+    for node in TG.nodes_iter():
+        if node == x:
+            continue
+        f[node] = float('inf')
+    for edge in edge_stream:
+        if x == edge[0] and edge[2] >= t_start and (edge[2] + edge[3]) <= t_end:
+            S.add(edge)
+
+    
+    for e in list(S):
+        earliest_times = earliest_arrival_time(TG, edge_stream, e[1], t_start+e[3]+e[2], t_end)
+        print earliest_times
+        for key, value in earliest_times.items():
+                if key != x and f[key] > 0:
+                    f[key] = min(f[key], earliest_times[key] - e[2]) 
+       
+    return f
+    
+
+def create_L_v(TG, edge_stream, x, t_start, t_end):
+    L = {}
+    arrive_times = earliest_arrival_time(TG, edge_stream, x, t_start, t_end)
+    for key, value in arrive_times.items():
+        L[key] = (t_start, value)
+    
+    return sorted(L.items(), key=lambda item: item[1])
+
+def one_pass_fatest_path_duration1(TG, edge_stream, x, t_start, t_end):
+    
+    L = {}   
+    f = {}
+    f[x] = 0
+    for node in TG.nodes_iter():
+        L[node] = []
+        if node == x:
+            continue
+        f[node] = float('inf')
+    
+    for edge in edge_stream:
+        u = edge[0]
+        v = edge[1]
+        t = edge[2]
+        duraT = edge[3]
+        if t >= t_start and t + duraT <= t_end:
+            l = [u].extend([i[1] for i  in TG.out_edges(x)])
+            for x in l:
+                if u == x:
+                    if (t, t) not in L[x]:
+                        L[x].append((t, t))
+                
+                max_i = max(L[u], key=lambda item: item[1])
+                a1_u = max_i[1]
+                s1_u = max_i[0]
+                s_v = s1_u
+                a_v = t + duraT
+                for item in L[v]:
+                    if s_v == item[0]:
+                        item[1] = a_v
+                        break
+                else:
+                    L[v].append((s_v, a_v))
+                L[v].pop(0)
+                if a_v - s_v < f[v]:
+                    f[v] = a_v - s_v
+        else:
+            break
+    return f
+
+            
+             
 
 
-
-
+    
 
 if __name__ == "__main__":
 
@@ -94,7 +169,9 @@ if __name__ == "__main__":
     edge_stream = sorted(quad_tuple_edges, key = lambda item: item[2])
 
 
-    print earliest_arrival_time(TG, edge_stream, 'a', 1, 4)
-    print latest_departure_time(TG, reversed(edge_stream), 'l', 1, 10)
+    # print earliest_arrival_time(TG, edge_stream, 'a', 1, 4)
+    # print latest_departure_time(TG, reversed(edge_stream), 'l', 1, 10)
+    # print fatest_path_duration1(TG, edge_stream, 'a', 0, 10)
 
-    
+    # print create_L_v(TG, edge_stream, 'a', 0, 10)
+    print one_pass_fatest_path_duration1(TG, edge_stream, 'a', 0, 10)
